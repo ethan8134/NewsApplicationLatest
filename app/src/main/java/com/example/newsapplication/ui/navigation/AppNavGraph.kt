@@ -4,9 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.newsapp.ui.article.ArticleScreen
-import com.example.newsapp.ui.home.HomeScreen
-import com.example.newsapp.ui.settings.SettingsScreen
+import com.example.newsapplication.ui.article.ArticleScreen
+import com.example.newsapplication.ui.home.HomeScreen
+import com.example.newsapplication.ui.settings.SettingsScreen
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")
