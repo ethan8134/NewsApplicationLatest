@@ -1,9 +1,15 @@
 package com.example.newsapplication.ui.home
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.newsapplication.domain.repository.NewsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class HomeUiState(
     val isLoading: Boolean = false,
@@ -11,20 +17,23 @@ data class HomeUiState(
     val error: String? = null
 )
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(
+    private val repository: NewsRepository
+) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
-
-    init {
-        // later: load articles from repository
-        fakeLoad()
-    }
-
-    private fun fakeLoad() {
-        _uiState.value = HomeUiState(
-            isLoading = false,
-            articles = listOf("Title 1", "Title 2", "Title 3")
+    val uiState: StateFlow<HomeUiState> = repository
+        .getHeadlinesStream()
+        .map { list -> HomeUiState(articles = list) }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            HomeUiState()
         )
+
+    fun refresh() {
+        viewModelScope.launch {
+            repository.refreshHeadlines()
+        }
     }
 }
+
