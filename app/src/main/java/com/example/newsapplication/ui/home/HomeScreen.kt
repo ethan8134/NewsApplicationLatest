@@ -1,4 +1,4 @@
-package com.example.newsapp.ui.home
+package com.example.newsapplication.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

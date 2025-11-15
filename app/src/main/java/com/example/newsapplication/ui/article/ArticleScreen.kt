@@ -1,4 +1,4 @@
-package com.example.newsapp.ui.article
+package com.example.newsapplication.ui.article
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
