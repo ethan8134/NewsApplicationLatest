@@ -9,29 +9,29 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.newsapplication.R
+import com.example.newsapplication.ui.home.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onArticleClick: () -> Unit,
-    onSettingsClick: () -> Unit
+    onSettingsClick: () -> Unit,
+    viewModel: HomeViewModel = viewModel()
 ) {
+    val state by viewModel.uiState.collectAsState()
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Actualités hors-ligne") },
-                actions = {
-                    IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Default.Settings, contentDescription = "Paramètres")
-                    }
-                }
-            )
+            NewsTopBar(onSettingsClick)
         }
     ) { padding ->
 
@@ -63,6 +63,35 @@ data class FakeArticle(
     val title: String,
     val date: String
 )
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NewsTopBar(onSettingsClick: () -> Unit) {
+    TopAppBar(
+        title = {
+            Text(
+                "Daily News",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = Color.White
+                )
+            )
+        },
+        actions = {
+            IconButton(onClick = onSettingsClick) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Paramètres",
+                    tint = Color.White
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color(0xFF5D4037), // Rouge profond style "journal"
+            titleContentColor = Color.White
+        )
+    )
+}
+
 
 @Composable
 fun ArticleCard(
