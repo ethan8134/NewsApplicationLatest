@@ -1,12 +1,17 @@
 package com.example.newsapplication.data.remote
 
-import com.example.newsapplication.domain.model.Article
+import com.example.newsapplication.data.local.ArticleEntity
+import com.example.newsapplication.data.remote.ArticleDto
 
-fun ArticleDto.toDomain(): Article {
-    return Article(
-        id = id ?: "",
-        title = title ?: "No title",
-        content = content ?: "No content",
-        imageUrl = imageUrl
+fun ArticleDto.toEntity(): ArticleEntity {
+    return ArticleEntity(
+        id = id,
+        title = title,
+        description = description,
+        content = content,
+        url = url,
+        imageUrl = imageUrl,
+        publishedAt = publishedAt,
+        lang = lang
     )
 }

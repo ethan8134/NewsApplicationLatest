@@ -1,6 +1,11 @@
 package com.example.newsapplication.ui.article
 
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
@@ -11,13 +16,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.newsapplication.NewsApplication
+import com.example.newsapplication.domain.model.Article
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleScreen(
     articleId: String,
-    onBack: () -> Unit,
+    onBack: () -> Unit
 ) {
     val app = LocalContext.current.applicationContext as NewsApplication
 
@@ -33,10 +41,7 @@ fun ArticleScreen(
                 title = { Text("Article") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -48,38 +53,102 @@ fun ArticleScreen(
                 .padding(padding)
                 .fillMaxSize()
         ) {
-            when {
-                state.isLoading -> {
-                    CircularProgressIndicator(Modifier.align(Alignment.Center))
-                }
 
-                state.error != null -> {
-                    val error = state.error
+            val article = state.article
+            val error = state.error
+
+            when {
+                state.isLoading ->
+                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+
+                error != null ->
                     Text(
-                        text = error ?: "Error",
+                        text = error,
                         modifier = Modifier.align(Alignment.Center)
                     )
-                }
 
-                else -> {
-                    val article = state.article
-                    if (article != null) {
-                        ArticleContent(article)
-                    }
-                }
+                article != null ->
+                    ArticleContent(article)
             }
-
         }
     }
 }
 
 @Composable
-fun ArticleContent(article: com.example.newsapplication.domain.model.Article) {
+fun ArticleContent(article: Article) {
+    val scrollState = rememberScrollState()
+    val context = LocalContext.current
+
     Column(
-        modifier = Modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier
+            .verticalScroll(scrollState)
+            .fillMaxSize()
     ) {
-        Text(text = article.title, style = MaterialTheme.typography.titleLarge)
-        Text(text = article.content ?: "No content available")
+
+        // --------------------------
+        // IMAGE HEADER
+        // --------------------------
+        AsyncImage(
+            model = article.imageUrl,
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(240.dp)
+        )
+
+        // --------------------------
+        // TEXT CONTENT
+        // --------------------------
+        Column(
+            modifier = Modifier
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            // TITLE
+            Text(
+                text = article.title,
+                style = MaterialTheme.typography.headlineSmall
+            )
+
+            // DATE (quand tu l'auras)
+            article.publishedAt?.let {
+                Text(
+                    text = "Published: $it",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            // DESCRIPTION
+            if (!article.description.isNullOrBlank()) {
+                Text(
+                    text = article.description,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            // CONTENT (souvent tronqué, on l'affiche en secondary)
+            if (!article.content.isNullOrBlank()) {
+                Text(
+                    text = article.content,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            // --------------------------
+            // BUTTON : full article
+            // --------------------------
+            Button(
+                onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW, article.url?.toUri())
+                    context.startActivity(intent)
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Read full article")
+            }
+        }
     }
 }

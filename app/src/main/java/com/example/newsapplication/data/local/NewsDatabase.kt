@@ -7,7 +7,7 @@ import android.content.Context
 
 @Database(
     entities = [ArticleEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class NewsDatabase : RoomDatabase() {
@@ -24,8 +24,12 @@ abstract class NewsDatabase : RoomDatabase() {
                     context.applicationContext,
                     NewsDatabase::class.java,
                     "news_db"
-                ).build().also { INSTANCE = it }
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
+                    .also { INSTANCE = it }
             }
         }
     }
 }
+

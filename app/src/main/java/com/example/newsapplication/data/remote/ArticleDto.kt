@@ -5,13 +5,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ArticleDto(
-    @SerialName("id") val id: String?,
-    @SerialName("title") val title: String?,
-    @SerialName("description") val description: String?,
-    @SerialName("content") val content: String?,
-    @SerialName("url") val url: String?,
-    @SerialName("image") val imageUrl: String?,
-    @SerialName("publishedAt") val publishedAt: String?,
-    @SerialName("lang") val lang: String?,
-    @SerialName("source") val source: SourceDto?
+    val id: String,
+    val title: String,
+    val description: String? = null,
+    val content: String? = null,
+    val url: String? = null,
+    @SerialName("image") val imageUrl: String? = null,
+    val publishedAt: String? = null,
+    val lang: String? = null
 )
