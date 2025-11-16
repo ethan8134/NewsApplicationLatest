@@ -9,52 +9,94 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.newsapplication.NewsApplication
 import com.example.newsapplication.R
+import com.example.newsapplication.domain.model.Article
 import com.example.newsapplication.ui.home.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onArticleClick: () -> Unit,
-    onSettingsClick: () -> Unit,
-    viewModel: HomeViewModel = viewModel()
+    onSettingsClick: () -> Unit
 ) {
+    val app = LocalContext.current.applicationContext as NewsApplication
+    val viewModel: HomeViewModel = viewModel(
+        factory = HomeViewModelFactory(app.container.repository)
+    )
+
     val state by viewModel.uiState.collectAsState()
+
+    // Trigger initial refresh when screen appears
+    LaunchedEffect(Unit) {
+        viewModel.refresh()
+    }
+
     Scaffold(
         topBar = {
             NewsTopBar(onSettingsClick)
         }
     ) { padding ->
 
-        val fakeNews = listOf(
-            FakeArticle("Titre article 1", "2025-01-01"),
-            FakeArticle("Titre article 2", "2025-01-02"),
-            FakeArticle("Titre article 3", "2025-01-03")
-        )
-
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(fakeNews) { article ->
-                ArticleCard(
-                    title = article.title,
-                    date = article.date,
-                    onClick = onArticleClick
-                )
+
+            when {
+                state.isLoading && state.articles.isEmpty() -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
+                state.errorMessage != null && state.articles.isEmpty() -> {
+                    Text(
+                        text = state.errorMessage ?: "Unknown error",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
+                else -> {
+                    ArticlesList(
+                        articles = state.articles,
+                        onArticleClick = onArticleClick
+                    )
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun ArticlesList(
+    articles: List<Article>,
+    onArticleClick: () -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(articles) { article ->
+            ArticleCard(
+                title = article.title,
+                date = "", // we can wire publishedAt later
+                onClick = onArticleClick
+            )
         }
     }
 }
