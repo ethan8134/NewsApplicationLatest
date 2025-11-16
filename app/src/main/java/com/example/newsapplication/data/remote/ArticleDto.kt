@@ -12,5 +12,12 @@ data class ArticleDto(
     val url: String? = null,
     @SerialName("image") val imageUrl: String? = null,
     val publishedAt: String? = null,
-    val lang: String? = null
+    val lang: String? = null,
+    val source: SourceDto
 )
+
+
+
+
+
+

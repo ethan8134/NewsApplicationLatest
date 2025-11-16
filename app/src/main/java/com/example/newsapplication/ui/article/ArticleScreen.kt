@@ -84,10 +84,6 @@ fun ArticleContent(article: Article) {
             .verticalScroll(scrollState)
             .fillMaxSize()
     ) {
-
-        // --------------------------
-        // IMAGE HEADER
-        // --------------------------
         AsyncImage(
             model = article.imageUrl,
             contentDescription = null,
@@ -95,23 +91,16 @@ fun ArticleContent(article: Article) {
                 .fillMaxWidth()
                 .height(240.dp)
         )
-
-        // --------------------------
-        // TEXT CONTENT
-        // --------------------------
         Column(
             modifier = Modifier
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
-            // TITLE
             Text(
                 text = article.title,
                 style = MaterialTheme.typography.headlineSmall
             )
 
-            // DATE (quand tu l'auras)
             article.publishedAt?.let {
                 Text(
                     text = "Published: $it",
@@ -119,8 +108,6 @@ fun ArticleContent(article: Article) {
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-
-            // DESCRIPTION
             if (!article.description.isNullOrBlank()) {
                 Text(
                     text = article.description,
@@ -128,7 +115,6 @@ fun ArticleContent(article: Article) {
                 )
             }
 
-            // CONTENT (souvent tronqué, on l'affiche en secondary)
             if (!article.content.isNullOrBlank()) {
                 Text(
                     text = article.content,
@@ -137,9 +123,6 @@ fun ArticleContent(article: Article) {
                 )
             }
 
-            // --------------------------
-            // BUTTON : full article
-            // --------------------------
             Button(
                 onClick = {
                     val intent = Intent(Intent.ACTION_VIEW, article.url?.toUri())

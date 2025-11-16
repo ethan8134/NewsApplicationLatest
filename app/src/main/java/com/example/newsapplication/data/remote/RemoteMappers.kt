@@ -12,6 +12,10 @@ fun ArticleDto.toEntity(): ArticleEntity {
         url = url,
         imageUrl = imageUrl,
         publishedAt = publishedAt,
-        lang = lang
+        lang = lang,
+        sourceId = source.id,
+        sourceName = source.name,
+        sourceUrl = source.url,
+        sourceCountry = source.country
     )
 }

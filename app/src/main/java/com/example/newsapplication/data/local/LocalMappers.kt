@@ -2,6 +2,7 @@ package com.example.newsapplication.data.local
 
 import com.example.newsapplication.data.local.ArticleEntity
 import com.example.newsapplication.domain.model.Article
+import com.example.newsapplication.domain.model.Source
 
 fun ArticleEntity.toDomain(): Article {
     return Article(
@@ -12,6 +13,12 @@ fun ArticleEntity.toDomain(): Article {
         url = url,
         imageUrl = imageUrl,
         publishedAt = publishedAt,
-        lang = lang
+        lang = lang,
+        source = Source(
+            id = sourceId,
+            name = sourceName,
+            url = sourceUrl,
+            country = sourceCountry
+        )
     )
 }

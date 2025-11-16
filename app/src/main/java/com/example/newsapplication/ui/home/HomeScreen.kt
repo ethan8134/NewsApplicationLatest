@@ -38,7 +38,6 @@ fun HomeScreen(
 
     val state by viewModel.uiState.collectAsState()
 
-    // Trigger initial refresh when screen appears
     LaunchedEffect(Unit) {
         viewModel.refresh()
     }
@@ -130,7 +129,7 @@ fun NewsTopBar(onSettingsClick: () -> Unit) {
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xFF5D4037), // Rouge profond style "journal"
+            containerColor = Color(0xFF5D4037),
             titleContentColor = Color.White
         )
     )
@@ -150,7 +149,6 @@ fun ArticleCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
-            // Image placeholder, tu pourras la remplacer plus tard par une image API
             Image(
                 painter = painterResource(id = R.drawable.placeholder),
                 contentDescription = "Image article",

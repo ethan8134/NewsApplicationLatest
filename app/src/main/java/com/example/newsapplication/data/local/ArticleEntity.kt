@@ -12,5 +12,9 @@ data class ArticleEntity(
     val url: String?,
     val imageUrl: String?,
     val publishedAt: String?,
-    val lang: String?
+    val lang: String?,
+    val sourceId: String?,
+    val sourceName: String?,
+    val sourceUrl: String?,
+    val sourceCountry: String?
 )
