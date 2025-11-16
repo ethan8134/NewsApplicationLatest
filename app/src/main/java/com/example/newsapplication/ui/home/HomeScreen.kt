@@ -28,7 +28,7 @@ import com.example.newsapplication.ui.home.HomeViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onArticleClick: () -> Unit,
+    onArticleClick: (String) -> Unit,
     onSettingsClick: () -> Unit
 ) {
     val app = LocalContext.current.applicationContext as NewsApplication
@@ -72,8 +72,11 @@ fun HomeScreen(
                 else -> {
                     ArticlesList(
                         articles = state.articles,
-                        onArticleClick = onArticleClick
+                        onArticleClick = { id ->
+                            onArticleClick(id)
+                        }
                     )
+
                 }
             }
         }
@@ -81,25 +84,24 @@ fun HomeScreen(
 }
 
 @Composable
-private fun ArticlesList(
+fun ArticlesList(
     articles: List<Article>,
-    onArticleClick: () -> Unit
+    onArticleClick: (String) -> Unit
 ) {
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(12.dp),
+        modifier = Modifier.padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(articles) { article ->
             ArticleCard(
                 title = article.title,
-                date = "", // we can wire publishedAt later
-                onClick = onArticleClick
+                date = "",
+                onClick = { onArticleClick(article.id) }
             )
         }
     }
 }
+
 
 data class FakeArticle(
     val title: String,

@@ -5,57 +5,81 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.newsapplication.ui.article.ArticleViewModel
+import com.example.newsapplication.NewsApplication
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleScreen(
+    articleId: String,
     onBack: () -> Unit,
-    viewModel: ArticleViewModel = viewModel()
-    ) {
+) {
+    val app = LocalContext.current.applicationContext as NewsApplication
+
+    val viewModel: ArticleViewModel = viewModel(
+        factory = ArticleViewModelFactory(app.container.repository, articleId)
+    )
+
     val state by viewModel.uiState.collectAsState()
-    LaunchedEffect(Unit) {
-        viewModel.loadFakeArticle()
-    }
+
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = { Text("Article") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.Black,               // Color of the icon
-                            modifier = Modifier.size(28.dp)   // Bigger arrow
+                            contentDescription = null
                         )
                     }
                 }
-
             )
         }
     ) { padding ->
-        Column(
+
+        Box(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
                 .fillMaxSize()
         ) {
-            Text("Titre de l'article", style = MaterialTheme.typography.titleLarge)
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                "Contenu de l'article.\n" +
-                        "Ce texte est statique pour le moment et sera remplacé plus tard " +
-                        "par les données provenant du Repository."
-            )
+            when {
+                state.isLoading -> {
+                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                }
+
+                state.error != null -> {
+                    val error = state.error
+                    Text(
+                        text = error ?: "Error",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
+                else -> {
+                    val article = state.article
+                    if (article != null) {
+                        ArticleContent(article)
+                    }
+                }
+            }
+
         }
+    }
+}
+
+@Composable
+fun ArticleContent(article: com.example.newsapplication.domain.model.Article) {
+    Column(
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(text = article.title, style = MaterialTheme.typography.titleLarge)
+        Text(text = article.content ?: "No content available")
     }
 }
